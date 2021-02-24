@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,14 +39,27 @@ class ImageUploader extends StatefulWidget {
 }
 
 class _ImageUploaderState extends State<ImageUploader> {
-  UploadTask _uploadTask;
+  StreamController<TaskSnapshot> _streamController;
+  StreamSubscription<TaskSnapshot> _uploadSubscription;
+  @override
+  void initState() {
+    _streamController = StreamController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _streamController?.close();
+    _uploadSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final picker = context.watch<ImagesProvider>();
     return StreamBuilder<TaskSnapshot>(
-        stream: _uploadTask.snapshotEvents,
+        stream: _streamController.stream,
         builder: (context, snapshot) {
           final taskSnapshot = snapshot.data;
           return InkWell(
@@ -112,13 +127,15 @@ class _ImageUploaderState extends State<ImageUploader> {
                             color: Colors.green,
                           ),
                           tooltip: 'upload image',
-                          onPressed: () => setState(() => _uploadTask = picker
-                              .uploadImage(
-                                category: widget.category,
-                                dishId: widget.dishId,
-                                index: widget.index,
-                              )
-                              .whenComplete(() => print(snapshot.data.state)))),
+                          onPressed: () {
+                            final uploadTask = picker.uploadImage(
+                              category: widget.category,
+                              dishId: widget.dishId,
+                              index: widget.index,
+                            );
+                            _uploadSubscription =
+                                uploadTask.listen(_streamController.add);
+                          }),
                       if (taskSnapshot != null &&
                           taskSnapshot.state == TaskState.running)
                         Center(

@@ -52,20 +52,21 @@ class ImagesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  UploadTask uploadImage({
+  Stream<TaskSnapshot> uploadImage({
     @required String category,
     @required String dishId,
     @required int index,
-  }) {
+  }) async* {
     final image = imagesFiles[index];
+
     final task = _storage
         .ref()
         .child(category)
         .child(dishId)
         .child(image.name)
         .putData(image.bytes);
-    taskStates[index] = task.snapshot.state;
-    notifyListeners();
-    return task;
+    task.whenComplete(() async =>
+        setImageUrl(index, await task.snapshot.ref.getDownloadURL()));
+    yield* task.snapshotEvents;
   }
 }
