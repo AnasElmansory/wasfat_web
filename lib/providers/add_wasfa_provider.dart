@@ -45,7 +45,7 @@ class AddWasfaProvider extends ChangeNotifier {
     if (value.isEmpty) return null;
 
     StringBuffer tempSteps = StringBuffer("""<h2>طريقه التحضير</h2>""");
-    String finalSteps = """""";
+    String finalSteps = '';
     String temp = '';
     if (value.contains('طريقه التحضير'))
       temp = value.replaceAll('طريقه التحضير', "").trim();
@@ -62,7 +62,7 @@ class AddWasfaProvider extends ChangeNotifier {
       if (index > 0)
         finalSteps = tempSteps
             .toString()
-            .replaceAll('i', """<img src ="${images[index]}">""");
+            .replaceAll('image$index', """<img src ="${images[index]}">""");
     });
 
     return finalSteps.toString();
@@ -107,6 +107,7 @@ class AddWasfaProvider extends ChangeNotifier {
       addDate: DateTime.now(),
       dishImages: dishImages,
     );
+    print(dish.dishDescription);
     updatingDb = true;
     await _firestore
         .collection('dishes')

@@ -1,29 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    Fore more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+  -->
+  <base href="/">
+
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
-
+  <meta name="google-signin-client_id" content="909815027221-pjtg8hojs18jji5sljaakpgc2e76q91e.apps.googleusercontent.com" />
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="flutter_web_app">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="wasfat_web">
+  <link rel="apple-touch-icon" href="icons/android-icon-192x192.png">
 
   <!-- Favicon -->
-  <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon-16x16.png"/>
 
-  <title>flutter_web_app</title>
+  <title>wasfat_panel</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+        <script defer src="/__/firebase/8.2.9/firebase-app.js"></script>
+        <script defer src="/__/firebase/8.2.9/firebase-auth.js"></script>
+        <script defer src="/__/firebase/8.2.9/firebase-firestore.js"></script>
+        <script defer src="/__/firebase/8.2.9/firebase-storage.js"></script>
+        <!-- <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-storage.js"></script> -->
+       <script>
+         var firebaseConfig = {
+        apiKey: "AIzaSyCTezbm-9cMah7YgT2edmQQ_Q-Pj068DnQ",
+        authDomain: "wasfat-5edfe.firebaseapp.com",
+        databaseURL: "https://wasfat-5edfe.firebaseio.com",
+        projectId: "wasfat-5edfe",
+        storageBucket: "wasfat-5edfe.appspot.com",
+        messagingSenderId: "54356560170",
+        appId: "1:54356560170:web:853554457d5e65295a7653",
+       
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+       </script> 
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
+      window.addEventListener('flutter-first-frame', function () {
         navigator.serviceWorker.register('flutter_service_worker.js');
       });
     }

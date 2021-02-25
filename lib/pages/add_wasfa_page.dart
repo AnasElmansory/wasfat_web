@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wasfat_web/custom_widgets/category_ids_widget.dart';
-import 'package:wasfat_web/custom_widgets/custom_bar.dart';
 import 'package:wasfat_web/custom_widgets/dish_name_widget.dart';
 import 'package:wasfat_web/custom_widgets/image_picker.dart';
 import 'package:wasfat_web/custom_widgets/ingredients_widget.dart';
@@ -82,74 +80,11 @@ class _AddWasfaPageState extends State<AddWasfaPage> {
                 ],
               ),
             ),
-            LimitedBox(
-              maxHeight: size.height * 0.2,
-              child: ImagePicker(
-                category: widget.foodCategory.name,
-                dishId: dishId,
-              ),
+            ImagePicker(
+              category: widget.foodCategory.name,
+              dishId: dishId,
             ),
-            LimitedBox(
-              maxHeight: size.height * 0.2,
-              child: const CategoryIds(),
-            ),
-            if (testDish != null)
-              LimitedBox(
-                maxHeight: 300,
-                child: CustomScrollView(slivers: [
-                  CustomBar(
-                    name: testDish.name,
-                    imageUrl: testDish.dishImages.first,
-                  ),
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 8),
-                        margin: const EdgeInsets.all(12.0),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Text(
-                          testDish.subtitle,
-                          textAlign: TextAlign.right,
-                          textDirection: TextDirection.rtl,
-                        ),
-                      ),
-                      Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          margin: const EdgeInsets.all(12.0),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(10)),
-                          child: HtmlWidget(
-                            testDish.dishDescription,
-                          )),
-                    ]),
-                  ),
-                ]),
-              ),
-            FlatButton(
-              child: const Text('test'),
-              onPressed: () {
-                setState(() {
-                  testDish = Dish(
-                      id: dishId,
-                      name: _nameController.text.trim(),
-                      subtitle: _subtitleController.text.trim(),
-                      dishDescription: dishProvider.dishDescriptionFormation(
-                          dishProvider.ingredientsModelingAndValidation(
-                              _ingredientsController.text),
-                          dishProvider.stepsModelingAndValidation(
-                              _stepsController.text,
-                              imagesProvider.images.values.toList())),
-                      dishImages: imagesProvider.images.values.toList(),
-                      addDate: DateTime.now(),
-                      categoryId: const [],
-                      rating: const {});
-                });
-              },
-            )
+            const CategoryIds(),
           ],
         ),
       ),
@@ -158,26 +93,23 @@ class _AddWasfaPageState extends State<AddWasfaPage> {
         child: FloatingActionButton(
           backgroundColor: Colors.amber[900],
           child: const Icon(Icons.add),
-          onPressed: () async {
-            await dishProvider
-                .addDish(
-              id: dishId,
-              dishName: _nameController.text.trim(),
-              dishSubtitle: _subtitleController.text.trim(),
-              dishIngredients: _ingredientsController.text.trim(),
-              dishSteps: _stepsController.text.trim(),
-              categoryIds: categoryProvider.tempCategoryIdsList,
-              dishImages: imagesProvider.images.values.toList(),
-            )
-                .then((_) {
-              _nameController.clear();
-              _subtitleController.clear();
-              _ingredientsController.clear();
-              _stepsController.clear();
-              categoryProvider.emptyList();
-              imagesProvider.emptyLists();
-            });
-          },
+          onPressed: () async => await dishProvider
+              .addDish(
+                  id: dishId,
+                  dishName: _nameController.text.trim(),
+                  dishSubtitle: _subtitleController.text.trim(),
+                  dishIngredients: _ingredientsController.text.trim(),
+                  dishSteps: _stepsController.text.trim(),
+                  categoryIds: categoryProvider.tempCategoryIdsList,
+                  dishImages: imagesProvider.images.values.toList())
+              .then((_) {
+            _nameController.clear();
+            _subtitleController.clear();
+            _ingredientsController.clear();
+            _stepsController.clear();
+            categoryProvider.emptyList();
+            imagesProvider.emptyLists();
+          }),
         ),
       ),
     );

@@ -62,94 +62,86 @@ class _ImageUploaderState extends State<ImageUploader> {
         stream: _streamController.stream,
         builder: (context, snapshot) {
           final taskSnapshot = snapshot.data;
-          return InkWell(
-            onTap: () {
-              print(taskSnapshot.bytesTransferred);
-              print(taskSnapshot.state);
-              print(taskSnapshot.totalBytes);
-            },
-            child: Container(
-              height: size.height * 0.4,
-              width: size.width * 0.2,
-              child: Column(
-                children: [
-                  Container(
-                    height: size.height * 0.3,
-                    width: size.width * 0.3,
-                    color: Colors.black45,
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: (picker.imagesFiles.containsKey(widget.index))
-                              ? Image(
-                                  image: MemoryImage(
-                                      picker.imagesFiles[widget.index].bytes),
-                                  fit: BoxFit.cover,
-                                )
-                              : const Icon(
-                                  Icons.photo,
-                                  color: Colors.white,
-                                ),
-                        ),
-                        if (taskSnapshot != null &&
-                            taskSnapshot.state == TaskState.success)
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black45,
-                              ),
-                              child: const Icon(
-                                Icons.done,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  ButtonBar(
-                    alignment: MainAxisAlignment.center,
+          return Container(
+            height: size.height * 0.4,
+            width: size.width * 0.2,
+            child: Column(
+              children: [
+                Container(
+                  height: size.height * 0.3,
+                  width: size.width * 0.3,
+                  color: Colors.black45,
+                  child: Stack(
                     children: [
-                      IconButton(
-                        icon:
-                            const Icon(Icons.photo_library, color: Colors.teal),
-                        tooltip: 'pick image',
-                        onPressed: () async =>
-                            await picker.pickImage(index: widget.index),
+                      Positioned.fill(
+                        child: (picker.imagesFiles.containsKey(widget.index))
+                            ? Image(
+                                image: MemoryImage(
+                                    picker.imagesFiles[widget.index].bytes),
+                                fit: BoxFit.cover,
+                              )
+                            : const Icon(
+                                Icons.photo,
+                                color: Colors.white,
+                              ),
                       ),
-                      IconButton(
-                          icon: const Icon(
-                            Icons.cloud_upload,
-                            color: Colors.green,
-                          ),
-                          tooltip: 'upload image',
-                          onPressed: () {
-                            final uploadTask = picker.uploadImage(
-                              category: widget.category,
-                              dishId: widget.dishId,
-                              index: widget.index,
-                            );
-                            _uploadSubscription =
-                                uploadTask.listen(_streamController.add);
-                          }),
                       if (taskSnapshot != null &&
-                          taskSnapshot.state == TaskState.running)
-                        Center(
-                          child: CircularProgressIndicator(
-                            backgroundColor: Colors.amber[700],
-                            value: (taskSnapshot.bytesTransferred /
-                                    taskSnapshot.totalBytes)
-                                .toDouble(),
+                          taskSnapshot.state == TaskState.success)
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.black45,
+                            ),
+                            child: const Icon(
+                              Icons.done,
+                              color: Colors.green,
+                            ),
                           ),
                         ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                ButtonBar(
+                  alignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.photo_library, color: Colors.teal),
+                      tooltip: 'pick image',
+                      onPressed: () async =>
+                          await picker.pickImage(index: widget.index),
+                    ),
+                    IconButton(
+                        icon: const Icon(
+                          Icons.cloud_upload,
+                          color: Colors.green,
+                        ),
+                        tooltip: 'upload image',
+                        onPressed: () {
+                          final uploadTask = picker.uploadImage(
+                            category: widget.category,
+                            dishId: widget.dishId,
+                            index: widget.index,
+                          );
+                          _uploadSubscription =
+                              uploadTask.listen(_streamController.add);
+                        }),
+                    if (taskSnapshot != null &&
+                        taskSnapshot.state == TaskState.running)
+                      Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.amber[700],
+                          value: (taskSnapshot.bytesTransferred /
+                                  taskSnapshot.totalBytes)
+                              .toDouble(),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
             ),
           );
         });
