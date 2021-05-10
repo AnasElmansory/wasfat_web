@@ -1,60 +1,62 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wasfat_web/models/user.dart';
 
 class Auth extends ChangeNotifier {
-  final GoogleSignIn _googleSignIn;
   final FirebaseAuth _firebaseAuth;
   final FirebaseFirestore _firestore;
-  final SharedPreferences _sharedPreferences;
+
+  WasfatUser? wasfatUser;
 
   Auth(
-    this._googleSignIn,
     this._firebaseAuth,
     this._firestore,
-    this._sharedPreferences,
   );
 
-  WasfatUser wasfatUser;
+  Future<bool> isLoggedIn() async {
+    final shared = await SharedPreferences.getInstance();
+    return shared.getBool('isLoggedIn') ?? false;
+  }
 
-  bool get isLoggedIn => _sharedPreferences.getBool('authenticated') ?? false;
-  String get userId => _firebaseAuth.currentUser?.uid;
+  // String get userId => _firebaseAuth.currentUser?.uid;
 
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
     await _firebaseAuth.signOut();
-    await _sharedPreferences.setBool('authenticated', false);
+    final shared = await SharedPreferences.getInstance();
+    await shared.setBool('isLoggedIn', false);
     wasfatUser = null;
     notifyListeners();
   }
 
   Future<void> getUserData() async {
-    if (isLoggedIn) {
+    if (await isLoggedIn()) {
       final userSnapshot = await _firestore
           .collection('users')
-          .doc(_firebaseAuth.currentUser.uid)
+          .doc(_firebaseAuth.currentUser?.uid)
           .get();
-      wasfatUser = WasfatUser.fromMap(userSnapshot.data());
+      if (userSnapshot.data() != null)
+        wasfatUser = WasfatUser.fromMap(userSnapshot.data()!);
       notifyListeners();
     }
   }
 
   Future<void> signInWithGoogle() async {
+    final shared = await SharedPreferences.getInstance();
     final userCredential =
         await _firebaseAuth.signInWithPopup(GoogleAuthProvider());
-    if (userCredential?.user?.uid != null)
-      await _sharedPreferences.setBool('authenticated', true);
-    wasfatUser = WasfatUser(
-      uid: userCredential.user.uid,
-      name: userCredential.user.displayName,
-      email: userCredential.user.email,
-      phoneNumber: userCredential.user.phoneNumber,
-      photoURL: userCredential.user.photoURL,
-    );
+    final isUser = userCredential.user != null;
+    if (isUser) {
+      await shared.setBool('isLoggedIn', true);
+      wasfatUser = WasfatUser(
+        uid: userCredential.user!.uid,
+        name: userCredential.user!.displayName ?? '',
+        email: userCredential.user!.email ?? '',
+        phoneNumber: userCredential.user!.phoneNumber ?? '',
+        photoURL: userCredential.user!.photoURL ?? '',
+      );
+    }
     notifyListeners();
   }
 }

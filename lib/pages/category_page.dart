@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:getwidget/components/list_tile/gf_list_tile.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:provider/provider.dart';
 import 'package:wasfat_web/pages/add_wasfa_page.dart';
 import 'package:wasfat_web/providers/categorylist_provider.dart';
 
 class CategoryPage extends StatefulWidget {
+  const CategoryPage();
   @override
   _CategoryPageState createState() => _CategoryPageState();
 }

@@ -1,30 +1,30 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:wasfat_web/models/dish.dart';
 
+import 'package:wasfat_web/models/dish.dart';
 
 class FoodCategory {
   final String id;
   final String name;
   final String imageUrl;
-  final String banner;
-  final List<Dish> dishes;
+  final String? banner;
+  final List<Dish>? dishes;
 
-  FoodCategory({
-    this.id,
-    this.name,
-    this.imageUrl,
+  const FoodCategory({
+    required this.id,
+    required this.name,
+    required this.imageUrl,
     this.banner,
     this.dishes,
   });
 
   FoodCategory copyWith({
-    String id,
-    String name,
-    String imageUrl,
-    String banner,
-    List<Dish> dishes,
+    String? id,
+    String? name,
+    String? imageUrl,
+    String? banner,
+    List<Dish>? dishes,
   }) {
     return FoodCategory(
       id: id ?? this.id,
@@ -46,14 +46,12 @@ class FoodCategory {
   }
 
   factory FoodCategory.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return FoodCategory(
       id: map['id'],
       name: map['name'],
       imageUrl: map['imageUrl'],
       banner: map['banner'],
-      dishes: map['dishes'] as List<Dish> ?? null,
+      dishes: List<Dish>.from(map['dishes']?.map((x) => Dish.fromMap(x))),
     );
   }
 
@@ -68,15 +66,15 @@ class FoodCategory {
   }
 
   @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
 
-    return o is FoodCategory &&
-        o.id == id &&
-        o.name == name &&
-        o.imageUrl == imageUrl &&
-        o.banner == banner &&
-        listEquals(o.dishes, dishes);
+    return other is FoodCategory &&
+        other.id == id &&
+        other.name == name &&
+        other.imageUrl == imageUrl &&
+        other.banner == banner &&
+        listEquals(other.dishes, dishes);
   }
 
   @override
