@@ -4,9 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wasfat_web/providers/add_wasfa_provider.dart';
+import 'package:wasfat_web/firebase/category_service.dart';
+import 'package:wasfat_web/firebase/dishes_services.dart';
+import 'package:wasfat_web/providers/add_dish_provider.dart';
 import 'package:wasfat_web/providers/auth_provider.dart';
-import 'package:wasfat_web/providers/categorylist_provider.dart';
+import 'package:wasfat_web/providers/category_provider.dart';
+import 'package:wasfat_web/providers/dishes_provider.dart';
 import 'package:wasfat_web/providers/images_provider.dart';
 
 final getIt = GetIt.instance;
@@ -16,21 +19,30 @@ void getInit() {
         getIt<FirebaseAuth>(),
         getIt<FirebaseFirestore>(),
       ));
-  getIt.registerFactory<CategoryListProvider>(() => CategoryListProvider(
-        getIt<FirebaseFirestore>(),
+  getIt.registerFactory<CategoriesProvider>(() => CategoriesProvider(
+        getIt<CategoryService>(),
       ));
-  getIt.registerFactory<AddWasfaProvider>(() => AddWasfaProvider(
-        getIt<FirebaseFirestore>(),
+  getIt.registerFactory<AddDishProvider>(() => AddDishProvider(
+        getIt<DishesService>(),
       ));
   getIt.registerFactory<ImagesProvider>(() => ImagesProvider(
         getIt<FilePicker>(),
         getIt<FirebaseStorage>(),
       ));
+  getIt.registerFactory<DishesProvider>(() => DishesProvider(
+        getIt<DishesService>(),
+      ));
+
+  getIt.registerLazySingleton<DishesService>(
+      () => DishesService(getIt<FirebaseFirestore>()));
   getIt.registerLazySingleton<FilePicker>(() => FilePicker.platform);
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   getIt.registerLazySingleton<FirebaseStorage>(() => FirebaseStorage.instance);
+  getIt.registerLazySingleton<CategoryService>(
+      () => CategoryService(getIt<FirebaseFirestore>()));
   getIt.registerLazySingleton<FirebaseFirestore>(
       () => FirebaseFirestore.instance);
+
   getIt.registerSingletonAsync<SharedPreferences>(
       () async => await SharedPreferences.getInstance());
 }

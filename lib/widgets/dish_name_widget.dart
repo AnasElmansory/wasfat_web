@@ -1,36 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:wasfat_web/providers/add_dish_provider.dart';
 
 class DishName extends StatelessWidget {
-  final TextEditingController controller;
-
-  const DishName({Key key, this.controller}) : super(key: key);
+  const DishName();
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    // final size = context.mediaQuerySize;
+    final addDishProvider = context.watch<AddDishProvider>();
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      height: size.height * 0.2,
-      width: size.width * 0.5,
-      child: Row(
-        children: [
-          Expanded(flex: 1, child: const Text('dish name')),
-          Expanded(
-              flex: 4,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.amber[800])),
-                child: TextField(
-                  controller: controller,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Enter dish name',
-                  ),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        // height: size.height * 0.2,
+        // width: size.width * 0.5,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: TextField(
+            controller: addDishProvider.dishNameController,
+            maxLength: 50,
+            // maxLines: 1,
+            decoration: const InputDecoration(
+              border: const OutlineInputBorder(
+                borderSide: const BorderSide(
+                  color: const Color(0xFFFF8000),
                 ),
-              )),
-        ],
-      ),
-    );
+              ),
+              labelText: 'Dish Name',
+            ),
+          ),
+        ));
   }
 }

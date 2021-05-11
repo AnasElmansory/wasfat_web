@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:wasfat_web/providers/add_dish_provider.dart';
+
 import 'package:wasfat_web/providers/images_provider.dart';
 
 class ImagePicker extends StatelessWidget {
-  final String category;
-  final String dishId;
-  const ImagePicker({Key key, this.category, this.dishId}) : super(key: key);
+  const ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -28,19 +29,19 @@ class ImagePicker extends StatelessWidget {
 }
 
 class ImageUploader extends StatefulWidget {
-  final String category;
-  final String dishId;
   final int index;
 
-  const ImageUploader({Key key, this.category, this.dishId, this.index})
-      : super(key: key);
+  const ImageUploader({
+    Key? key,
+    required this.index,
+  }) : super(key: key);
   @override
   _ImageUploaderState createState() => _ImageUploaderState();
 }
 
 class _ImageUploaderState extends State<ImageUploader> {
-  StreamController<TaskSnapshot> _streamController;
-  StreamSubscription<TaskSnapshot> _uploadSubscription;
+  late StreamController<TaskSnapshot> _streamController;
+  StreamSubscription<TaskSnapshot>? _uploadSubscription;
   @override
   void initState() {
     _streamController = StreamController();
@@ -49,15 +50,16 @@ class _ImageUploaderState extends State<ImageUploader> {
 
   @override
   void dispose() {
-    _streamController?.close();
+    _streamController.close();
     _uploadSubscription?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = context.mediaQuerySize;
     final picker = context.watch<ImagesProvider>();
+    final addDishProvider = context.watch<AddDishProvider>();
     return StreamBuilder<TaskSnapshot>(
         stream: _streamController.stream,
         builder: (context, snapshot) {
@@ -75,9 +77,8 @@ class _ImageUploaderState extends State<ImageUploader> {
                     children: [
                       Positioned.fill(
                         child: (picker.imagesFiles.containsKey(widget.index))
-                            ? Image(
-                                image: MemoryImage(
-                                    picker.imagesFiles[widget.index].bytes),
+                            ? Image.memory(
+                                picker.imagesFiles[widget.index]!.bytes!,
                                 fit: BoxFit.cover,
                               )
                             : const Icon(
@@ -110,9 +111,9 @@ class _ImageUploaderState extends State<ImageUploader> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.photo_library, color: Colors.teal),
-                      tooltip: 'pick image',
+                      tooltip: 'Pick Image',
                       onPressed: () async =>
-                          await picker.pickImage(index: widget.index),
+                          await picker.pickImage(widget.index),
                     ),
                     IconButton(
                         icon: const Icon(
@@ -122,8 +123,8 @@ class _ImageUploaderState extends State<ImageUploader> {
                         tooltip: 'upload image',
                         onPressed: () {
                           final uploadTask = picker.uploadImage(
-                            category: widget.category,
-                            dishId: widget.dishId,
+                            category: addDishProvider.category!,
+                            dishId: addDishProvider.getDishId!,
                             index: widget.index,
                           );
                           _uploadSubscription =
@@ -133,7 +134,7 @@ class _ImageUploaderState extends State<ImageUploader> {
                         taskSnapshot.state == TaskState.running)
                       Center(
                         child: CircularProgressIndicator(
-                          backgroundColor: Colors.amber[700],
+                          backgroundColor: const Color(0xFFFFA000),
                           value: (taskSnapshot.bytesTransferred /
                                   taskSnapshot.totalBytes)
                               .toDouble(),

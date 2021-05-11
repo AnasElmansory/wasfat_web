@@ -4,7 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fluttertoast/fluttertoast_web.dart';
 
 class ImagesProvider extends ChangeNotifier {
   final FilePicker _filePicker;
@@ -35,36 +35,38 @@ class ImagesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> pickImage({@required int index}) async {
+  Future<void> pickImage(int index) async {
     if (taskStates[index] == TaskState.running)
-      return await Fluttertoast.showToast(
+      return await FluttertoastWebPlugin().addHtmlToast(
         msg: 'uploading image in progress please wait...',
-        backgroundColor: Colors.black45,
       );
     final result = await _filePicker.pickFiles(
       withData: true,
       type: FileType.image,
     );
     if (result == null)
-      return await Fluttertoast.showToast(msg: 'no images picked');
+      return await FluttertoastWebPlugin().addHtmlToast(
+        msg: 'no images picked',
+      );
+
     final imageFile = result.files.single;
     _imagesFiles[index] = imageFile;
     notifyListeners();
   }
 
   Stream<TaskSnapshot> uploadImage({
-    @required String category,
-    @required String dishId,
-    @required int index,
+    required String category,
+    required String dishId,
+    required int index,
   }) async* {
     final image = imagesFiles[index];
-
+    if (image == null) return;
     final task = _storage
         .ref()
         .child(category)
         .child(dishId)
-        .child(image.name)
-        .putData(image.bytes);
+        .child(image.name!)
+        .putData(image.bytes!);
     task.whenComplete(() async =>
         setImageUrl(index, await task.snapshot.ref.getDownloadURL()));
     yield* task.snapshotEvents;

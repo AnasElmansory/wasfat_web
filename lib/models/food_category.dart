@@ -41,17 +41,20 @@ class FoodCategory {
       'name': name,
       'imageUrl': imageUrl,
       'banner': banner,
-      'dishes': dishes?.map((x) => x?.toMap())?.toList(),
+      'dishes': dishes?.map((x) => x.toMap()).toList(),
     };
   }
 
   factory FoodCategory.fromMap(Map<String, dynamic> map) {
+    final dishes = map['dishes'] != null
+        ? List<Dish>.from(map['dishes']?.map((x) => Dish.fromMap(x)))
+        : null;
     return FoodCategory(
       id: map['id'],
       name: map['name'],
       imageUrl: map['imageUrl'],
       banner: map['banner'],
-      dishes: List<Dish>.from(map['dishes']?.map((x) => Dish.fromMap(x))),
+      dishes: dishes,
     );
   }
 

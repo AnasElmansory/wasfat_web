@@ -2,25 +2,25 @@ import 'dart:convert';
 
 class WasfatUser {
   final String uid;
-  final String name;
   final String email;
-  final String photoURL;
-  final String phoneNumber;
+  final String? name;
+  final String? photoURL;
+  final String? phoneNumber;
 
-  WasfatUser({
-    this.uid,
+  const WasfatUser({
+    required this.uid,
+    required this.email,
     this.name,
-    this.email,
     this.photoURL,
     this.phoneNumber,
   });
 
   WasfatUser copyWith({
-    String uid,
-    String name,
-    String email,
-    String photoURL,
-    String phoneNumber,
+    String? uid,
+    String? name,
+    String? email,
+    String? photoURL,
+    String? phoneNumber,
   }) {
     return WasfatUser(
       uid: uid ?? this.uid,
@@ -42,8 +42,6 @@ class WasfatUser {
   }
 
   factory WasfatUser.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
-
     return WasfatUser(
       uid: map['uid'],
       name: map['displayName'],

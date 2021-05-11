@@ -5,45 +5,45 @@ import 'package:flutter/foundation.dart';
 class Dish {
   final String id;
   final String name;
-  final String subtitle;
+  final String? subtitle;
   final String dishDescription;
   final DateTime addDate;
-  final Map<String, int> rating;
+  final Map<String, int>? rating;
   final List<String> categoryId;
-  final List<String> dishImages;
-  final String dishVideo;
+  final List<String>? dishImages;
+  final String? dishVideo;
 
-  Dish({
-    @required this.id,
-    @required this.name,
-    @required this.subtitle,
-    @required this.categoryId,
-    @required this.dishDescription,
-    @required this.addDate,
-    @required this.dishImages,
+  const Dish({
+    required this.id,
+    required this.name,
+    required this.categoryId,
+    required this.dishDescription,
+    required this.addDate,
+    this.subtitle,
     this.rating = const <String, int>{},
+    this.dishImages,
     this.dishVideo,
   });
 
   Dish copyWith({
-    String id,
-    String name,
-    String subtitle,
-    String dishDescription,
-    DateTime addDate,
-    Map<String, int> rating,
-    List<String> categoryId,
-    List<String> dishImages,
-    String dishVideo,
+    String? id,
+    String? name,
+    String? subtitle,
+    String? dishDescription,
+    DateTime? addDate,
+    Map<String, int>? rating,
+    List<String>? categoryId,
+    List<String>? dishImages,
+    String? dishVideo,
   }) {
     return Dish(
       id: id ?? this.id,
       name: name ?? this.name,
       subtitle: subtitle ?? this.subtitle,
-      categoryId: categoryId ?? this.categoryId,
       dishDescription: dishDescription ?? this.dishDescription,
       addDate: addDate ?? this.addDate,
       rating: rating ?? this.rating,
+      categoryId: categoryId ?? this.categoryId,
       dishImages: dishImages ?? this.dishImages,
       dishVideo: dishVideo ?? this.dishVideo,
     );
@@ -54,26 +54,29 @@ class Dish {
       'id': id,
       'name': name,
       'subtitle': subtitle,
-      'categoryId': categoryId,
       'dishDescription': dishDescription,
-      'addDate': addDate?.millisecondsSinceEpoch,
+      'addDate': addDate.millisecondsSinceEpoch,
       'rating': rating,
+      'categoryId': categoryId,
       'dishImages': dishImages,
       'dishVideo': dishVideo,
     };
   }
 
   factory Dish.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
+    final rating =
+        map['rating'] != null ? Map<String, int>.from(map['rating']) : null;
+    final dishImages =
+        map['dishImages'] != null ? List<String>.from(map['dishImages']) : null;
     return Dish(
       id: map['id'],
       name: map['name'],
       subtitle: map['subtitle'],
       dishDescription: map['dishDescription'],
       addDate: DateTime.fromMillisecondsSinceEpoch(map['addDate']),
-      rating: Map<String, int>.from(map['rating']),
+      rating: rating,
       categoryId: List<String>.from(map['categoryId']),
-      dishImages: List<String>.from(map['dishImages']),
+      dishImages: dishImages,
       dishVideo: map['dishVideo'],
     );
   }
@@ -84,23 +87,23 @@ class Dish {
 
   @override
   String toString() {
-    return 'Dish(id: $id, name: $name, categoryId: $categoryId, subtitle: $subtitle,dishDescription: $dishDescription, addDate: $addDate, rating: $rating, dishImages: $dishImages, dishVideo: $dishVideo)';
+    return 'Dish(id: $id, name: $name, subtitle: $subtitle, dishDescription: $dishDescription, addDate: $addDate, rating: $rating, categoryId: $categoryId, dishImages: $dishImages, dishVideo: $dishVideo)';
   }
 
   @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
 
-    return o is Dish &&
-        o.id == id &&
-        o.name == name &&
-        o.subtitle == subtitle &&
-        o.dishDescription == dishDescription &&
-        o.addDate == addDate &&
-        mapEquals(o.rating, rating) &&
-        listEquals(o.categoryId, categoryId) &&
-        listEquals(o.dishImages, dishImages) &&
-        o.dishVideo == dishVideo;
+    return other is Dish &&
+        other.id == id &&
+        other.name == name &&
+        other.subtitle == subtitle &&
+        other.dishDescription == dishDescription &&
+        other.addDate == addDate &&
+        mapEquals(other.rating, rating) &&
+        listEquals(other.categoryId, categoryId) &&
+        listEquals(other.dishImages, dishImages) &&
+        other.dishVideo == dishVideo;
   }
 
   @override
@@ -108,10 +111,10 @@ class Dish {
     return id.hashCode ^
         name.hashCode ^
         subtitle.hashCode ^
-        categoryId.hashCode ^
         dishDescription.hashCode ^
         addDate.hashCode ^
         rating.hashCode ^
+        categoryId.hashCode ^
         dishImages.hashCode ^
         dishVideo.hashCode;
   }
