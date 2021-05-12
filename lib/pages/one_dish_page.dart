@@ -6,6 +6,7 @@ import 'package:wasfat_web/providers/add_dish_provider.dart';
 import 'package:wasfat_web/widgets/custom_bar.dart';
 import 'package:wasfat_web/widgets/dish_steps_box.dart';
 import 'package:wasfat_web/widgets/dish_subtitle_box.dart';
+import 'package:wasfat_web/widgets/dish_widgets/subtitle_edit_dialog.dart';
 import 'package:wasfat_web/widgets/image_picker.dart';
 
 class OneDishPage extends StatelessWidget {
@@ -14,7 +15,7 @@ class OneDishPage extends StatelessWidget {
   const OneDishPage({Key? key, required this.dish}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    handleDishIdAndCategory(dish.id, dish.categoryId);
+    handleDishIdAndCategory(dish);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -22,7 +23,11 @@ class OneDishPage extends StatelessWidget {
           SliverList(
             delegate: SliverChildListDelegate(
               [
-                DishSubtitleBox(subtitle: dish.subtitle ?? ''),
+                InkWell(
+                    onTap: () async {
+                      await Get.dialog(SubtitleEditDialog(dish: dish));
+                    },
+                    child: DishSubtitleBox(subtitle: dish.subtitle ?? '')),
                 DishStepsBox(dishDescription: dish.dishDescription),
                 const Center(child: const ImagePicker()),
               ],
@@ -34,10 +39,10 @@ class OneDishPage extends StatelessWidget {
   }
 }
 
-void handleDishIdAndCategory(String dishId, List<String> categoryId) {
+void handleDishIdAndCategory(Dish dish) {
   WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
     final dishProvider = Get.context!.read<AddDishProvider>();
-    dishProvider.setDishId = dishId;
-    dishProvider.dishCategories = categoryId;
+    dishProvider.setDishId = dish.id;
+    dishProvider.dishCategories = dish.categoryId;
   });
 }

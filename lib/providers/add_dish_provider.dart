@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast_web.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wasfat_web/firebase/dishes_services.dart';
 import 'package:wasfat_web/models/dish.dart';
+import 'package:wasfat_web/providers/dishes_provider.dart';
 
 class AddDishProvider extends ChangeNotifier {
   final DishesService _dishesService;
@@ -121,6 +124,20 @@ class AddDishProvider extends ChangeNotifier {
     this._dishDescriptionController.clear();
     this._dishIngredientsController.clear();
     this._dishCategories.clear();
+  }
+
+  Future<void> editDish(Dish dish) async {
+    final dishesProvider = Get.context!.read<DishesProvider>();
+    final subtitle = this._dishSubtitleController.text;
+    // final ingredients = this._dishIngredientsController.text;
+    // final description = this._dishDescriptionController.text;
+
+    final editedDish = dish.copyWith(
+      subtitle: subtitle.isNotEmpty ? subtitle : null,
+    );
+    dishesProvider.dishes.remove(dish);
+    dishesProvider.dishes.add(editedDish);
+    await _dishesService.editDish(editedDish);
   }
 
   Future<void> addDish({

@@ -65,4 +65,7 @@ class DishesService {
 
   Future<void> addDish(Dish dish) async =>
       await _firestore.collection('dishes').doc(dish.id).set(dish.toMap());
+
+  Future<void> editDish(Dish dish) async =>
+      await _firestore.collection('dishes').doc(dish.id).update(dish.toMap());
 }
