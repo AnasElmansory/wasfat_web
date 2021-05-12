@@ -1,19 +1,50 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:wasfat_web/models/dish.dart';
+import 'package:wasfat_web/providers/auth_provider.dart';
 
 class DishesService {
   final FirebaseFirestore _firestore;
 
   const DishesService(this._firestore);
 
+  Stream<List<String>> listenDishLikes(String dishId) async* {
+    final query = _firestore.collection('dishLikes').doc(dishId).snapshots();
+    final likes = query.map((event) =>
+        List<String>.from(event.data()?['likes'] ?? const <String>[]));
+    yield* likes;
+  }
+
+  Future<void> likeDish(String dishId) async {
+    final userId = Get.context!.read<Auth>().wasfatUser?.uid;
+    if (userId == null) return;
+    final query = _firestore.collection('dishLikes').doc(dishId);
+    await query.set(
+      {
+        'likes': FieldValue.arrayUnion([userId])
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  Future<void> unlikeDish(String dishId) async {
+    final userId = Get.context!.read<Auth>().wasfatUser?.uid;
+    if (userId == null) return;
+    final query = _firestore.collection('dishLikes').doc(dishId);
+    await query.set(
+      {
+        'likes': FieldValue.arrayRemove([userId])
+      },
+      SetOptions(merge: true),
+    );
+  }
+
   Future<List<Dish>> getDishes({
-    int? page,
     int? pageSize,
     int? lastAddDish,
   }) async {
-    // final _page = page ?? 1;
     final limit = pageSize ?? 10;
-    // final skip = (_page - 1) * limit;
     final orderQuery = _firestore.collection('dishes').orderBy('addDate');
     final query = await orderQuery.startAfter([lastAddDish]).limit(limit).get();
     final dishes =

@@ -35,17 +35,20 @@ class Auth extends ChangeNotifier {
 
   Future<void> getUserData() async {
     if (await isLoggedIn()) {
-      final userSnapshot = await _firestore
-          .collection('admin')
-          .doc(_firebaseAuth.currentUser?.uid)
+      final query = await _firestore
+          .collection('admins')
+          .where('id', isEqualTo: _firebaseAuth.currentUser?.uid)
           .get();
-      if (userSnapshot.data() != null)
+
+      if (query.docs.isNotEmpty) {
+        final user = query.docs.single.data();
         wasfatUser = WasfatUser(
-          uid: userSnapshot.data()!['id'],
-          name: userSnapshot.data()!['name'],
-          email: userSnapshot.data()!['email'],
-          photoURL: userSnapshot.data()!['photoURL'],
+          uid: user['id'],
+          name: user['name'],
+          email: user['email'],
+          photoURL: user['photoURL'],
         );
+      }
       notifyListeners();
     }
   }

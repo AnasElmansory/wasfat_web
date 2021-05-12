@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:wasfat_web/helper/constants.dart';
 import 'package:wasfat_web/widgets/show_image_dialog.dart';
 
 class DishStepsBox extends StatelessWidget {
@@ -26,6 +28,20 @@ class DishStepsBox extends StatelessWidget {
             context: context,
             builder: (context) => ShowImageDialog(photoUrl: url),
           );
+        },
+        customWidgetBuilder: (element) {
+          if (element.localName == 'img')
+            return Center(
+              child: FadeInImage.assetNetwork(
+                height: size.height * 0.4,
+                width: size.width * 0.3,
+                placeholder: 'assets/placeholder.png',
+                image: corsBridge + (element.attributes['src'] ?? ''),
+                imageErrorBuilder: (context, error, stackTrace) =>
+                    Image.asset('assets/placeholder.png'),
+                fit: BoxFit.cover,
+              ),
+            );
         },
         customStylesBuilder: (element) {
           if (element.localName == 'p')

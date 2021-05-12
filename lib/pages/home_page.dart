@@ -13,9 +13,7 @@ class HomePage extends StatelessWidget {
     final pageProvider = context.watch<PageProvider>();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.amber[800],
         title: const Text('wasfat pannel'),
-        centerTitle: true,
       ),
       body: Container(
         child: Row(

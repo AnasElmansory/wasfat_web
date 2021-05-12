@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:provider/provider.dart';
 import 'package:wasfat_web/providers/add_dish_provider.dart';
 
@@ -142,14 +143,7 @@ class _ImageUploaderState extends State<ImageUploader> {
                         }),
                     if (taskSnapshot != null &&
                         taskSnapshot.state == TaskState.running)
-                      Center(
-                        child: CircularProgressIndicator(
-                          backgroundColor: const Color(0xFFFFA000),
-                          value: (taskSnapshot.bytesTransferred /
-                                  taskSnapshot.totalBytes)
-                              .toDouble(),
-                        ),
-                      ),
+                      const Center(child: const GFLoader()),
                   ],
                 ),
               ],

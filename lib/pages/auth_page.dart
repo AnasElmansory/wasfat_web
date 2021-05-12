@@ -8,8 +8,8 @@ import 'package:wasfat_web/providers/auth_provider.dart';
 class UserCheckIdenticator extends StatelessWidget {
   const UserCheckIdenticator();
 
-  void _checkifUserSignedIn(BuildContext context) {
-    final auth = context.watch<Auth>();
+  void _checkifUserSignedIn() {
+    final auth = Get.context!.watch<Auth>();
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) async {
       final isLoggedIn = await auth.isLoggedIn();
       if (isLoggedIn)
@@ -21,7 +21,7 @@ class UserCheckIdenticator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _checkifUserSignedIn(context);
+    _checkifUserSignedIn();
     return Scaffold(
       body: const Center(
         child: const CircularProgressIndicator(),

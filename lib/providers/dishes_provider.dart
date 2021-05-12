@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast_web.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -10,6 +12,15 @@ class DishesProvider extends ChangeNotifier {
 
   final _controller = PagingController<int, Dish>(firstPageKey: 1);
   PagingController<int, Dish> get controller => this._controller;
+
+  StreamSubscription<List<String>>? _likesSubscription;
+
+  List<String> _oneDishLikes = [];
+  List<String> get oneDishLikes => this._oneDishLikes;
+  set oneDishLikes(List<String> value) {
+    this._oneDishLikes = value;
+    notifyListeners();
+  }
 
   Set<Dish> _dishes = Set();
   Set<Dish> get dishes => this._dishes;
@@ -26,17 +37,31 @@ class DishesProvider extends ChangeNotifier {
   }
 
   Future<List<Dish>> getDishes({
-    int? page,
     int? pageSize,
     int? lastAddDish,
   }) async {
     final result = await _dishesService.getDishes(
-      page: page,
       pageSize: pageSize,
       lastAddDish: lastAddDish,
     );
     dishes = result.toSet();
     return result;
+  }
+
+  Future<void> listenDishLikes(String dishId) async {
+    await _likesSubscription?.cancel();
+    _likesSubscription = null;
+    _likesSubscription = _dishesService
+        .listenDishLikes(dishId)
+        .listen((likes) => oneDishLikes = likes);
+  }
+
+  Future<void> likeDish(String dishId) async {
+    await _dishesService.likeDish(dishId);
+  }
+
+  Future<void> unlikeDish(String dishId) async {
+    await _dishesService.unlikeDish(dishId);
   }
 
   Future<List<Dish>> searchDish(String query) async {
@@ -53,7 +78,7 @@ class DishesProvider extends ChangeNotifier {
           lastAddDish = this._dishes.last.addDate.millisecondsSinceEpoch;
         else
           lastAddDish = 0;
-        final result = await getDishes(page: pageKey, lastAddDish: lastAddDish);
+        final result = await getDishes(lastAddDish: lastAddDish);
         final isLastPage = dishes.length < 10;
         if (isLastPage)
           this._controller.appendLastPage(result);
@@ -69,6 +94,7 @@ class DishesProvider extends ChangeNotifier {
   @override
   void dispose() {
     this._controller.dispose();
+    _likesSubscription?.cancel();
     super.dispose();
   }
 }
