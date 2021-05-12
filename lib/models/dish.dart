@@ -94,16 +94,7 @@ class Dish {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Dish &&
-        other.id == id &&
-        other.name == name &&
-        other.subtitle == subtitle &&
-        other.dishDescription == dishDescription &&
-        other.addDate == addDate &&
-        mapEquals(other.rating, rating) &&
-        listEquals(other.categoryId, categoryId) &&
-        listEquals(other.dishImages, dishImages) &&
-        other.dishVideo == dishVideo;
+    return other is Dish && other.id == id && other.name == name;
   }
 
   @override

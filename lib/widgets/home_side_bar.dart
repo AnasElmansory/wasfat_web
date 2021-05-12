@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:provider/provider.dart';
 import 'package:wasfat_web/helper/constants.dart';
+import 'package:wasfat_web/navigation.dart';
 import 'package:wasfat_web/providers/auth_provider.dart';
 import 'package:wasfat_web/providers/page_provider.dart';
 
@@ -33,7 +34,10 @@ class HomeSideBar extends StatelessWidget {
             const SizedBox(height: 50),
             GFButton(
               text: 'log out',
-              onPressed: () async => await auth.signOut(),
+              onPressed: () async {
+                await auth.signOut();
+                await navigateToSignPage();
+              },
             ),
           ],
         ),

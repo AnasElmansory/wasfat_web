@@ -11,10 +11,10 @@ class DishesProvider extends ChangeNotifier {
   final _controller = PagingController<int, Dish>(firstPageKey: 1);
   PagingController<int, Dish> get controller => this._controller;
 
-  List<Dish> _dishes = [];
-  List<Dish> get dishes => this._dishes;
-  set dishes(List<Dish> value) {
-    this._dishes = value;
+  Set<Dish> _dishes = Set();
+  Set<Dish> get dishes => this._dishes;
+  set dishes(Set<Dish> value) {
+    this._dishes.addAll(value);
     notifyListeners();
   }
 
@@ -35,12 +35,13 @@ class DishesProvider extends ChangeNotifier {
       pageSize: pageSize,
       lastAddDish: lastAddDish,
     );
-    dishes = result;
+    dishes = result.toSet();
     return result;
   }
 
   Future<List<Dish>> searchDish(String query) async {
     final dishes = await _dishesService.searchDish(query);
+    searchDishes = dishes;
     return dishes;
   }
 

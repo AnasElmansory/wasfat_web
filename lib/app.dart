@@ -26,14 +26,22 @@ class App extends StatelessWidget {
       ],
       child: GetMaterialApp(
         title: 'وصفات',
-        home: UserCheckIdenticator(),
+        theme: ThemeData(
+          appBarTheme: AppBarTheme(
+            backgroundColor: Colors.amber[800],
+            centerTitle: true,
+          ),
+        ),
+        home: const UserCheckIdenticator(),
       ),
     );
   }
 }
 
 class UserCheckIdenticator extends StatelessWidget {
-  void checkifUserSignedIn(BuildContext context) {
+  const UserCheckIdenticator();
+
+  void _checkifUserSignedIn(BuildContext context) {
     final auth = context.watch<Auth>();
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) async {
       final isLoggedIn = await auth.isLoggedIn();
@@ -46,7 +54,7 @@ class UserCheckIdenticator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    checkifUserSignedIn(context);
+    _checkifUserSignedIn(context);
     return Scaffold(
       body: const Center(
         child: const CircularProgressIndicator(),
@@ -56,6 +64,7 @@ class UserCheckIdenticator extends StatelessWidget {
 }
 
 Future<void> _navigateToHomePage() async {
+  await Get.context!.read<Auth>().getUserData();
   await Get.off(() => const HomePage());
 }
 

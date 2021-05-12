@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wasfat_web/providers/add_dish_provider.dart';
+import 'package:wasfat_web/providers/images_provider.dart';
 import 'package:wasfat_web/widgets/category_picker.dart';
 import 'package:wasfat_web/widgets/dish_description_widget.dart';
+import 'package:wasfat_web/widgets/dish_ingredients_widget.dart';
 import 'package:wasfat_web/widgets/dish_name_widget.dart';
 import 'package:wasfat_web/widgets/dish_subtitle_widget.dart';
 import 'package:wasfat_web/widgets/image_picker.dart';
@@ -17,12 +20,6 @@ class AddDishPage extends StatefulWidget {
 
 class _AddDishPageState extends State<AddDishPage> {
   @override
-  void initState() {
-    context.read<AddDishProvider>().setDishId = Uuid().v1();
-    super.initState();
-  }
-
-  @override
   void dispose() {
     context.read<AddDishProvider>().setDishId = null;
     super.dispose();
@@ -30,18 +27,25 @@ class _AddDishPageState extends State<AddDishPage> {
 
   @override
   Widget build(BuildContext context) {
+    final addDishProvider = context.watch<AddDishProvider>();
+    final imagesProvider = context.watch<ImagesProvider>();
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      addDishProvider.setDishId = Uuid().v1();
+    });
     return Scaffold(
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           backgroundColor: Colors.amber,
-          onPressed: () {
-            //todo implement add dish
+          onPressed: () async {
+            await addDishProvider.addDish(
+              dishImages: imagesProvider.images.values.toList(),
+            );
+            imagesProvider.clearLists();
           }),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Expanded(
-              flex: 1,
+            Container(
               child: Row(
                 children: [
                   Expanded(flex: 1, child: const DishName()),
@@ -49,16 +53,16 @@ class _AddDishPageState extends State<AddDishPage> {
                 ],
               ),
             ),
-            Expanded(
-              flex: 1,
+            Container(
               child: Row(
                 children: [
                   Expanded(flex: 1, child: const DishSubtitle()),
-                  Expanded(flex: 1, child: const CategoryPicker()),
+                  Expanded(flex: 1, child: const DishIngredients()),
                 ],
               ),
             ),
-            Expanded(flex: 1, child: const ImagePicker()),
+            const CategoryPicker(),
+            const ImagePicker(),
           ],
         ),
       ),

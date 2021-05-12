@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast_web.dart';
+import 'package:uuid/uuid.dart';
 import 'package:wasfat_web/firebase/dishes_services.dart';
 import 'package:wasfat_web/models/dish.dart';
 
@@ -14,7 +15,7 @@ class AddDishProvider extends ChangeNotifier {
       this._dishSubtitleController;
   final _dishIngredientsController = TextEditingController();
   TextEditingController get dishIngredientsController =>
-      this._dishSubtitleController;
+      this._dishIngredientsController;
   final _dishDescriptionController = TextEditingController();
   TextEditingController get dishDescriptionController =>
       this._dishDescriptionController;
@@ -42,10 +43,10 @@ class AddDishProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  String? _category;
-  String? get category => this._category;
-  set category(String? value) {
-    this._category = value;
+  List<String> _dishCategories = [];
+  List<String> get dishCategories => this._dishCategories;
+  set dishCategories(List<String> value) {
+    this._dishCategories = value;
     notifyListeners();
   }
 
@@ -113,41 +114,49 @@ class AddDishProvider extends ChangeNotifier {
     return dishDescription.toString();
   }
 
+  void clearFields() {
+    this._dishId = Uuid().v1();
+    this._dishNameController.clear();
+    this._dishSubtitleController.clear();
+    this._dishDescriptionController.clear();
+    this._dishIngredientsController.clear();
+    this._dishCategories.clear();
+  }
+
   Future<void> addDish({
-    required String id,
-    required String dishName,
-    required String dishSubtitle,
-    required String dishIngredients,
-    required String dishSteps,
-    required List<String> categoryIds,
     required List<String> dishImages,
   }) async {
     if (_updatingDb) return;
-    final name = nameValidation(dishName);
-    final subtitle = subtitleValidation(dishSubtitle);
-    final ingredients = ingredientsModelingAndValidation(dishIngredients);
-    final steps = stepsModelingAndValidation(dishSteps, dishImages);
+    final name = nameValidation(this._dishNameController.text);
+    final subtitle = subtitleValidation(this._dishSubtitleController.text);
+    final ingredients =
+        ingredientsModelingAndValidation(this._dishIngredientsController.text);
+    final steps = stepsModelingAndValidation(
+        this._dishDescriptionController.text, dishImages);
     final dishDescription = dishDescriptionFormation(ingredients, steps);
     if (name == null ||
         subtitle == null ||
         ingredients == null ||
         steps == null ||
-        dishDescription == null)
+        dishDescription == null ||
+        this._dishCategories.isEmpty ||
+        this._dishId == null)
       return await FluttertoastWebPlugin()
           .addHtmlToast(msg: 'fill up all the fields');
     final dish = Dish(
-      id: id,
+      id: this._dishId!,
       name: name,
       subtitle: subtitle,
-      categoryId: categoryIds,
+      categoryId: this._dishCategories,
       dishDescription: dishDescription,
       addDate: DateTime.now(),
       dishImages: dishImages,
     );
-    print(dish.dishDescription);
+
     updatingDb = true;
     await _dishesService.addDish(dish);
     updatingDb = false;
     await FluttertoastWebPlugin().addHtmlToast(msg: 'dish uploaded');
+    clearFields();
   }
 }

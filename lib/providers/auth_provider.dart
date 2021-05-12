@@ -17,10 +17,13 @@ class Auth extends ChangeNotifier {
 
   Future<bool> isLoggedIn() async {
     final shared = await SharedPreferences.getInstance();
-    return shared.getBool('isLoggedIn') ?? false;
+    final _isLoggedIn = shared.getBool('isLoggedIn') ?? false;
+    final isUser = _firebaseAuth.currentUser != null;
+    if (_isLoggedIn && isUser)
+      return true;
+    else
+      return false;
   }
-
-  // String get userId => _firebaseAuth.currentUser?.uid;
 
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
@@ -33,13 +36,36 @@ class Auth extends ChangeNotifier {
   Future<void> getUserData() async {
     if (await isLoggedIn()) {
       final userSnapshot = await _firestore
-          .collection('users')
+          .collection('admin')
           .doc(_firebaseAuth.currentUser?.uid)
           .get();
       if (userSnapshot.data() != null)
-        wasfatUser = WasfatUser.fromMap(userSnapshot.data()!);
+        wasfatUser = WasfatUser(
+          uid: userSnapshot.data()!['id'],
+          name: userSnapshot.data()!['name'],
+          email: userSnapshot.data()!['email'],
+          photoURL: userSnapshot.data()!['photoURL'],
+        );
       notifyListeners();
     }
+  }
+
+  Future<WasfatUser?> checkAdminPermission(String userId) async {
+    final query = await _firestore
+        .collection('admins')
+        .where('id', isEqualTo: userId)
+        .get();
+    if (query.docs.isNotEmpty) {
+      final admin = query.docs.single.data();
+      wasfatUser = WasfatUser(
+        uid: admin['id'],
+        name: admin['name'],
+        email: admin['email'],
+        photoURL: admin['photoURL'],
+      );
+      return wasfatUser;
+    } else
+      return null;
   }
 
   Future<void> signInWithGoogle() async {
@@ -49,14 +75,8 @@ class Auth extends ChangeNotifier {
     final isUser = userCredential.user != null;
     if (isUser) {
       await shared.setBool('isLoggedIn', true);
-      wasfatUser = WasfatUser(
-        uid: userCredential.user!.uid,
-        name: userCredential.user!.displayName ?? '',
-        email: userCredential.user!.email ?? '',
-        phoneNumber: userCredential.user!.phoneNumber ?? '',
-        photoURL: userCredential.user!.photoURL ?? '',
-      );
+      final admin = await checkAdminPermission(userCredential.user!.uid);
+      wasfatUser = admin;
     }
-    notifyListeners();
   }
 }

@@ -11,9 +11,9 @@ class DishesService {
     int? pageSize,
     int? lastAddDish,
   }) async {
-    final _page = page ?? 1;
+    // final _page = page ?? 1;
     final limit = pageSize ?? 10;
-    final skip = (_page - 1) * limit;
+    // final skip = (_page - 1) * limit;
     final orderQuery = _firestore.collection('dishes').orderBy('addDate');
     final query = await orderQuery.startAfter([lastAddDish]).limit(limit).get();
     final dishes =
@@ -24,6 +24,7 @@ class DishesService {
   Future<List<Dish>> searchDish(String query) async {
     final searchQuery = await _firestore
         .collection('dishes')
+        .orderBy('name')
         .startAt([query]).endAt([query + '\uf8ff']).get();
     final dishes = searchQuery.docs
         .map<Dish>((dish) => Dish.fromMap(dish.data()))

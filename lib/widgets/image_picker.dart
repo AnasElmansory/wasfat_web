@@ -115,6 +115,14 @@ class _ImageUploaderState extends State<ImageUploader> {
                       onPressed: () async =>
                           await picker.pickImage(widget.index),
                     ),
+                    if (picker.imagesFiles[widget.index] != null)
+                      IconButton(
+                          onPressed: () =>
+                              picker.imagesFiles.remove(widget.index),
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          )),
                     IconButton(
                         icon: const Icon(
                           Icons.cloud_upload,
@@ -122,13 +130,15 @@ class _ImageUploaderState extends State<ImageUploader> {
                         ),
                         tooltip: 'upload image',
                         onPressed: () {
-                          final uploadTask = picker.uploadImage(
-                            category: addDishProvider.category!,
-                            dishId: addDishProvider.getDishId!,
-                            index: widget.index,
-                          );
-                          _uploadSubscription =
-                              uploadTask.listen(_streamController.add);
+                          if (addDishProvider.dishCategories.first.isNotEmpty) {
+                            final uploadTask = picker.uploadImage(
+                              category: addDishProvider.dishCategories.first,
+                              dishId: addDishProvider.getDishId!,
+                              index: widget.index,
+                            );
+                            _uploadSubscription =
+                                uploadTask.listen(_streamController.add);
+                          }
                         }),
                     if (taskSnapshot != null &&
                         taskSnapshot.state == TaskState.running)

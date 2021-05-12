@@ -28,7 +28,7 @@ class ImagesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void emptyLists() {
+  void clearLists() {
     _imagesFiles.clear();
     _images.clear();
     taskStates.clear();

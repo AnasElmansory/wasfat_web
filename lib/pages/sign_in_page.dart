@@ -50,17 +50,12 @@ class SignInPage extends StatelessWidget {
                   onPressed: () async {
                     if (!await isConnected())
                       return ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            'no internet connection',
-                          ),
-                        ),
+                        SnackBar(content: const Text('no internet connection')),
                       );
-                    else
-                      await auth.signInWithGoogle().then((_) async {
-                        if (await context.read<Auth>().isLoggedIn())
-                          await navigateToHomePage();
-                      });
+                    else {
+                      await auth.signInWithGoogle();
+                      if (await auth.isLoggedIn()) await navigateToHomePage();
+                    }
                   },
                   shape: const RoundedRectangleBorder(
                     borderRadius:
