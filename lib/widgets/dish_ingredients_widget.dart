@@ -6,12 +6,9 @@ class DishIngredients extends StatelessWidget {
   const DishIngredients();
   @override
   Widget build(BuildContext context) {
-    // final size = MediaQuery.of(context).size;
     final addDishProvider = context.watch<AddDishProvider>();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      // height: size.height * 0.2,
-      // width: size.width * 0.5,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: TextField(

@@ -126,8 +126,19 @@ class AddDishProvider extends ChangeNotifier {
     this._dishCategories.clear();
   }
 
+  String getIngredientsFromDish(String description) {
+    late String ingredients;
+    ingredients = description.replaceAll('<p>', '');
+    ingredients = ingredients.replaceAll('</p>', '');
+    ingredients = ingredients.replaceAll('<h2>', '');
+    ingredients = ingredients.replaceAll('</h2>', '');
+    ingredients = ingredients.split("طريقة التحضير").first;
+    ingredients = ingredients.replaceFirst('المكوّنات', '');
+    this.dishIngredientsController.text = ingredients;
+    return ingredients;
+  }
+
   Future<void> editDish(Dish dish) async {
-    final dishesProvider = Get.context!.read<DishesProvider>();
     final subtitle = this._dishSubtitleController.text;
     // final ingredients = this._dishIngredientsController.text;
     // final description = this._dishDescriptionController.text;
@@ -135,9 +146,17 @@ class AddDishProvider extends ChangeNotifier {
     final editedDish = dish.copyWith(
       subtitle: subtitle.isNotEmpty ? subtitle : null,
     );
-    dishesProvider.dishes.remove(dish);
-    dishesProvider.dishes.add(editedDish);
+    updateDish(dish, editedDish);
     await _dishesService.editDish(editedDish);
+  }
+
+  void updateDish(Dish oldDish, Dish editedDish) {
+    final dishesProvider = Get.context!.read<DishesProvider>();
+    dishesProvider.dishes.removeWhere((_dish) => _dish.id == oldDish.id);
+    dishesProvider.dishes.add(editedDish);
+    print(editedDish.subtitle);
+    dishesProvider.controller.itemList = dishesProvider.dishes.toList();
+    dishesProvider.controller.notifyListeners();
   }
 
   Future<void> addDish({

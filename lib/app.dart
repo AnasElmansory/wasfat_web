@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:wasfat_web/d_injection.dart';
 import 'package:wasfat_web/pages/auth_page.dart';
-import 'package:wasfat_web/pages/home_page.dart';
-import 'package:wasfat_web/pages/sign_in_page.dart';
 import 'package:wasfat_web/providers/add_dish_provider.dart';
 import 'package:wasfat_web/providers/auth_provider.dart';
 import 'package:wasfat_web/providers/category_provider.dart';

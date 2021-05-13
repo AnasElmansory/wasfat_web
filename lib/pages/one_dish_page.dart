@@ -6,6 +6,7 @@ import 'package:wasfat_web/providers/add_dish_provider.dart';
 import 'package:wasfat_web/widgets/custom_bar.dart';
 import 'package:wasfat_web/widgets/dish_steps_box.dart';
 import 'package:wasfat_web/widgets/dish_subtitle_box.dart';
+import 'package:wasfat_web/widgets/dish_widgets/description_edit_dialog.dart';
 import 'package:wasfat_web/widgets/dish_widgets/subtitle_edit_dialog.dart';
 import 'package:wasfat_web/widgets/image_picker.dart';
 
@@ -16,6 +17,7 @@ class OneDishPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     handleDishIdAndCategory(dish);
+    final addDishProvider = context.watch<AddDishProvider>();
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -25,10 +27,19 @@ class OneDishPage extends StatelessWidget {
               [
                 InkWell(
                     onTap: () async {
+                      addDishProvider.dishSubtitleController.text =
+                          dish.subtitle ?? '';
                       await Get.dialog(SubtitleEditDialog(dish: dish));
                     },
                     child: DishSubtitleBox(subtitle: dish.subtitle ?? '')),
-                DishStepsBox(dishDescription: dish.dishDescription),
+                InkWell(
+                  onTap: () async {
+                    addDishProvider
+                        .getIngredientsFromDish(dish.dishDescription);
+                    await Get.dialog(DescriptionEditDialog(dish: dish));
+                  },
+                  child: DishStepsBox(dishDescription: dish.dishDescription),
+                ),
                 const Center(child: const ImagePicker()),
               ],
             ),

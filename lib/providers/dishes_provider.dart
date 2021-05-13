@@ -45,7 +45,7 @@ class DishesProvider extends ChangeNotifier {
       lastAddDish: lastAddDish,
     );
     dishes = result.toSet();
-    return result;
+    return dishes.toList();
   }
 
   Future<void> listenDishLikes(String dishId) async {
