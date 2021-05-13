@@ -79,12 +79,23 @@ class AddDishProvider extends ChangeNotifier {
     return ingredients.toString();
   }
 
-  String? stepsModelingAndValidation(String value, List<String> images) {
+  String? insertImagesToSteps(String value, List<String> images) {
+    images.forEach((image) {
+      int index = images.indexOf(image);
+      if (index > 0)
+        value = value
+            .toString()
+            .replaceAll('image$index', """<img src ="${images[index]}">""");
+    });
+    return value;
+  }
+
+  String? stepsModelingAndValidation(String value, List<String>? images) {
     if (value.isEmpty) return null;
 
     StringBuffer tempSteps = StringBuffer("""<h2>طريقه التحضير</h2>""");
-    String finalSteps = '';
     String temp = '';
+    late String result;
     if (value.contains('طريقه التحضير'))
       temp = value.replaceAll('طريقه التحضير', "").trim();
     if (value.contains('طريقة التحضير'))
@@ -94,16 +105,11 @@ class AddDishProvider extends ChangeNotifier {
     temp = value.trim();
 
     temp.split('\n').forEach((c) => tempSteps.write("""<p>$c</p>"""));
+    result = tempSteps.toString();
+    if (images != null)
+      result = insertImagesToSteps(tempSteps.toString(), images) ?? '';
 
-    images.forEach((image) {
-      int index = images.indexOf(image);
-      if (index > 0)
-        finalSteps = tempSteps
-            .toString()
-            .replaceAll('image$index', """<img src ="${images[index]}">""");
-    });
-
-    return finalSteps.toString();
+    return result;
   }
 
   String? dishDescriptionFormation(String? ingredients, String? steps) {
@@ -126,12 +132,18 @@ class AddDishProvider extends ChangeNotifier {
     this._dishCategories.clear();
   }
 
-  String getIngredientsFromDish(String description) {
-    late String ingredients;
-    ingredients = description.replaceAll('<p>', '');
-    ingredients = ingredients.replaceAll('</p>', '');
-    ingredients = ingredients.replaceAll('<h2>', '');
-    ingredients = ingredients.replaceAll('</h2>', '');
+  String removeTags(String description) {
+    late String _description;
+    _description = description.replaceAll('<p>', '');
+    _description = _description.replaceAll('</p>', '');
+    _description = _description.replaceAll('<h2>', '');
+    _description = _description.replaceAll('</h2>', '');
+    return _description;
+  }
+
+  String getIngredientsFromDish(String value) {
+    final string = removeTags(value);
+    String ingredients = string;
     if (ingredients.contains('الخطوات'))
       ingredients = ingredients.split("الخطوات").first;
     else if (ingredients.contains('طريقة التحضير'))
@@ -139,17 +151,36 @@ class AddDishProvider extends ChangeNotifier {
     else if (ingredients.contains('طريقه التحضير'))
       ingredients = ingredients.split("طريقه التحضير").first;
     ingredients = ingredients.replaceFirst('المكوّنات', '');
-    this.dishIngredientsController.text = ingredients;
+    ingredients = ingredients.replaceFirst('المكونات', '');
+    ingredients.replaceAll('\&nbsp;', '');
+    this._dishIngredientsController.text = ingredients;
+    print(ingredients);
     return ingredients;
+  }
+
+  String getStepsFromDish(String value) {
+    final string = removeTags(value);
+    String steps = string;
+    if (steps.contains('الخطوات'))
+      steps = steps.split("الخطوات").last;
+    else if (steps.contains('طريقة التحضير'))
+      steps = steps.split("طريقة التحضير").last;
+    else if (steps.contains('طريقه التحضير'))
+      steps = steps.split("طريقه التحضير").last;
+    // print(steps);
+    this._dishDescriptionController.text = steps;
+    return steps;
   }
 
   Future<void> editDish(Dish dish) async {
     final subtitle = this._dishSubtitleController.text;
-    // final ingredients = this._dishIngredientsController.text;
-    // final description = this._dishDescriptionController.text;
+    final ingredients = this._dishIngredientsController.text;
+    final description = this._dishDescriptionController.text;
+    final dishDescription = dishDescriptionFormation(ingredients, description);
 
     final editedDish = dish.copyWith(
       subtitle: subtitle.isNotEmpty ? subtitle : null,
+      dishDescription: dishDescription,
     );
     updateDish(dish, editedDish);
     await _dishesService.editDish(editedDish);

@@ -36,6 +36,7 @@ class OneDishPage extends StatelessWidget {
                   onTap: () async {
                     addDishProvider
                         .getIngredientsFromDish(dish.dishDescription);
+                    addDishProvider.getStepsFromDish(dish.dishDescription);
                     await Get.dialog(DescriptionEditDialog(dish: dish));
                   },
                   child: DishStepsBox(dishDescription: dish.dishDescription),
