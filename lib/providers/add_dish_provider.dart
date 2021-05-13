@@ -132,7 +132,12 @@ class AddDishProvider extends ChangeNotifier {
     ingredients = ingredients.replaceAll('</p>', '');
     ingredients = ingredients.replaceAll('<h2>', '');
     ingredients = ingredients.replaceAll('</h2>', '');
-    ingredients = ingredients.split("طريقة التحضير").first;
+    if (ingredients.contains('الخطوات'))
+      ingredients = ingredients.split("الخطوات").first;
+    else if (ingredients.contains('طريقة التحضير'))
+      ingredients = ingredients.split("طريقة التحضير").first;
+    else if (ingredients.contains('طريقه التحضير'))
+      ingredients = ingredients.split("طريقه التحضير").first;
     ingredients = ingredients.replaceFirst('المكوّنات', '');
     this.dishIngredientsController.text = ingredients;
     return ingredients;
