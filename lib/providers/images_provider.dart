@@ -23,7 +23,7 @@ class ImagesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setImageUrl(int index, String url) {
+  void _setImageUrl(int index, String url) {
     _images[index] = url;
     notifyListeners();
   }
@@ -68,7 +68,7 @@ class ImagesProvider extends ChangeNotifier {
         .child(image.name!)
         .putData(image.bytes!);
     task.whenComplete(() async =>
-        setImageUrl(index, await task.snapshot.ref.getDownloadURL()));
+        _setImageUrl(index, await task.snapshot.ref.getDownloadURL()));
     yield* task.snapshotEvents;
   }
 }

@@ -1,1 +1,13 @@
 const corsBridge = "https://cors.bridged.cc/";
+const stepsType1 = "طريقه التحضير";
+const stepsType2 = "طريقة التحضير";
+const stepsType3 = "خطوات التحضير";
+const stepsType4 = "الخطوات";
+const stepsType5 = "الطريقة";
+const h2 = '<h2>';
+const h2Close = '</h2>';
+const p = '<p>';
+const pClose = '</p>';
+const ingredientsType1 = 'المكونات';
+const ingredientsType2 = 'المقادير';
+const ingredientsType3 = 'المكوّنات';

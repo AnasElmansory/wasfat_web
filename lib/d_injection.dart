@@ -10,6 +10,7 @@ import 'package:wasfat_web/providers/add_dish_provider.dart';
 import 'package:wasfat_web/providers/auth_provider.dart';
 import 'package:wasfat_web/providers/category_provider.dart';
 import 'package:wasfat_web/providers/dishes_provider.dart';
+import 'package:wasfat_web/providers/edit_dish_provider.dart';
 import 'package:wasfat_web/providers/images_provider.dart';
 
 final getIt = GetIt.instance;
@@ -23,6 +24,9 @@ void getInit() {
         getIt<CategoryService>(),
       ));
   getIt.registerFactory<AddDishProvider>(() => AddDishProvider(
+        getIt<DishesService>(),
+      ));
+  getIt.registerFactory<EditDishProvider>(() => EditDishProvider(
         getIt<DishesService>(),
       ));
   getIt.registerFactory<ImagesProvider>(() => ImagesProvider(

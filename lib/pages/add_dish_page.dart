@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wasfat_web/providers/add_dish_provider.dart';
@@ -48,21 +47,33 @@ class _AddDishPageState extends State<AddDishPage> {
             Container(
               child: Row(
                 children: [
-                  Expanded(flex: 1, child: const DishName()),
-                  Expanded(flex: 1, child: const DishDescription()),
+                  const Expanded(
+                    flex: 1,
+                    child: const DishName(),
+                  ),
+                  const Expanded(
+                    flex: 1,
+                    child: const DishDescription(forEdit: false),
+                  ),
                 ],
               ),
             ),
             Container(
               child: Row(
                 children: [
-                  Expanded(flex: 1, child: const DishSubtitle()),
-                  Expanded(flex: 1, child: const DishIngredients()),
+                  const Expanded(
+                    flex: 1,
+                    child: const DishSubtitle(forEdit: false),
+                  ),
+                  const Expanded(
+                    flex: 1,
+                    child: const DishIngredients(forEdit: false),
+                  ),
                 ],
               ),
             ),
             const CategoryPicker(),
-            const ImagePicker(),
+            const ImagePicker(forEdit: false),
           ],
         ),
       ),

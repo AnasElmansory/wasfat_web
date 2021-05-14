@@ -5,12 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:provider/provider.dart';
-import 'package:wasfat_web/providers/add_dish_provider.dart';
+import 'package:wasfat_web/helper/constants.dart';
 
+import 'package:wasfat_web/providers/add_dish_provider.dart';
 import 'package:wasfat_web/providers/images_provider.dart';
 
 class ImagePicker extends StatelessWidget {
-  const ImagePicker();
+  final bool forEdit;
+  final List<String>? dishImages;
+  const ImagePicker({
+    Key? key,
+    required this.forEdit,
+    this.dishImages,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +27,21 @@ class ImagePicker extends StatelessWidget {
         spacing: 8,
         runSpacing: 8,
         children: [
-          const ImageUploader(index: 0),
-          const ImageUploader(index: 1),
-          const ImageUploader(index: 2),
+          ImageUploader(
+            index: 0,
+            forEdit: forEdit,
+            dishImages: dishImages,
+          ),
+          ImageUploader(
+            index: 1,
+            forEdit: forEdit,
+            dishImages: dishImages,
+          ),
+          ImageUploader(
+            index: 2,
+            forEdit: forEdit,
+            dishImages: dishImages,
+          ),
         ],
       ),
     );
@@ -31,10 +50,14 @@ class ImagePicker extends StatelessWidget {
 
 class ImageUploader extends StatefulWidget {
   final int index;
+  final bool forEdit;
+  final List<String>? dishImages;
 
   const ImageUploader({
     Key? key,
     required this.index,
+    required this.forEdit,
+    this.dishImages,
   }) : super(key: key);
   @override
   _ImageUploaderState createState() => _ImageUploaderState();
@@ -61,6 +84,28 @@ class _ImageUploaderState extends State<ImageUploader> {
     final size = context.mediaQuerySize;
     final picker = context.watch<ImagesProvider>();
     final addDishProvider = context.watch<AddDishProvider>();
+    final isImageToUpload = picker.imagesFiles.containsKey(widget.index);
+    final imagesMap = widget.dishImages?.asMap();
+    final isImageFromDish = imagesMap?.containsKey(widget.index) ?? false;
+    Widget _image() {
+      return Positioned.fill(
+        child: (isImageToUpload)
+            ? Image.memory(
+                picker.imagesFiles[widget.index]!.bytes!,
+                fit: BoxFit.cover,
+              )
+            : (widget.forEdit && isImageFromDish)
+            ? Image.network(
+                corsBridge + imagesMap![widget.index]!,
+                fit: BoxFit.cover,
+              )
+            : const Icon(
+                Icons.photo,
+                color: Colors.white,
+              ),
+      );
+    }
+
     return StreamBuilder<TaskSnapshot>(
         stream: _streamController.stream,
         builder: (context, snapshot) {
@@ -76,17 +121,7 @@ class _ImageUploaderState extends State<ImageUploader> {
                   color: Colors.black45,
                   child: Stack(
                     children: [
-                      Positioned.fill(
-                        child: (picker.imagesFiles.containsKey(widget.index))
-                            ? Image.memory(
-                                picker.imagesFiles[widget.index]!.bytes!,
-                                fit: BoxFit.cover,
-                              )
-                            : const Icon(
-                                Icons.photo,
-                                color: Colors.white,
-                              ),
-                      ),
+                      _image(),
                       if (taskSnapshot != null &&
                           taskSnapshot.state == TaskState.success)
                         Positioned(
