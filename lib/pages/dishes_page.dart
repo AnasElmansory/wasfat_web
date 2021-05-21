@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:provider/provider.dart';
 import 'package:wasfat_web/models/dish.dart';
 import 'package:wasfat_web/providers/dishes_provider.dart';
@@ -23,23 +24,27 @@ class _DishesPageState extends State<DishesPage> {
   Widget build(BuildContext context) {
     final dishesProvider = context.watch<DishesProvider>();
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            top: 64,
-            child: PagedListView.separated(
-              pagingController: dishesProvider.controller,
-              separatorBuilder: (context, index) => const Divider(),
-              builderDelegate: PagedChildBuilderDelegate<Dish>(
-                itemBuilder: (context, dish, index) {
-                  return DishWidget(dish: dish);
-                },
+      body: LiquidPullToRefresh(
+        onRefresh: () async => dishesProvider.refresh(),
+        color: Colors.amber,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned.fill(
+              top: 64,
+              child: PagedListView.separated(
+                pagingController: dishesProvider.controller,
+                separatorBuilder: (context, index) => const Divider(),
+                builderDelegate: PagedChildBuilderDelegate<Dish>(
+                  itemBuilder: (context, dish, index) {
+                    return DishWidget(dish: dish);
+                  },
+                ),
               ),
             ),
-          ),
-          const DishesSearchBar(),
-        ],
+            const DishesSearchBar(),
+          ],
+        ),
       ),
     );
   }

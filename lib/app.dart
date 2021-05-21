@@ -10,6 +10,7 @@ import 'package:wasfat_web/providers/dishes_provider.dart';
 import 'package:wasfat_web/providers/edit_dish_provider.dart';
 import 'package:wasfat_web/providers/images_provider.dart';
 import 'package:wasfat_web/providers/page_provider.dart';
+import 'package:wasfat_web/widgets/image_picker.dart';
 
 class App extends StatelessWidget {
   const App();

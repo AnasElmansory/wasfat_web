@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wasfat_web/helper/constants.dart';
 import 'package:wasfat_web/providers/add_dish_provider.dart';
 import 'package:wasfat_web/providers/edit_dish_provider.dart';
 
@@ -29,6 +30,7 @@ class DishDescription extends StatelessWidget {
                 color: const Color(0xFFFF8000),
               ),
             ),
+            suffixText: stepsType2,
             labelText: 'Dish Description',
           ),
         ),

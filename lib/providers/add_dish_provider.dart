@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast_web.dart';
-import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wasfat_web/firebase/dishes_services.dart';
 import 'package:wasfat_web/helper/dish_description_utils.dart';
 import 'package:wasfat_web/models/dish.dart';
-import 'package:wasfat_web/providers/dishes_provider.dart';
 
 class AddDishProvider extends ChangeNotifier {
   final DishesService _dishesService;
@@ -69,16 +66,12 @@ class AddDishProvider extends ChangeNotifier {
     if (_updatingDb) return;
     final name = nameValidation(this._dishNameController.text);
     final subtitle = subtitleValidation(this._dishSubtitleController.text);
-    final ingredients =
-        ingredientsModelingAndValidation(this._dishIngredientsController.text);
-    final steps = stepsModelingAndValidation(
-        this._dishDescriptionController.text, dishImages);
-    final dishDescription = dishDescriptionFormation(ingredients, steps);
+    final ingredients = ingredientsToHtml(this._dishIngredientsController.text);
+    final steps = stepsToHtml(this._dishDescriptionController.text, dishImages);
+    final dishDescription = makeDishDescription(ingredients, steps);
+
     if (name == null ||
         subtitle == null ||
-        ingredients == null ||
-        steps == null ||
-        dishDescription == null ||
         this._dishCategories.isEmpty ||
         this._dishId == null)
       return await FluttertoastWebPlugin()

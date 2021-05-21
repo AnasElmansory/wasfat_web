@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:wasfat_web/helper/constants.dart';
 import 'package:wasfat_web/widgets/show_image_dialog.dart';
 

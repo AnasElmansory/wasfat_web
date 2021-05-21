@@ -91,6 +91,12 @@ class DishesProvider extends ChangeNotifier {
     }
   }
 
+  void refresh() {
+    _controller.itemList?.clear();
+    _controller.nextPageKey = 0;
+    _controller.refresh();
+  }
+
   @override
   void dispose() {
     this._controller.dispose();

@@ -10,19 +10,8 @@ import 'package:wasfat_web/widgets/dish_name_widget.dart';
 import 'package:wasfat_web/widgets/dish_subtitle_widget.dart';
 import 'package:wasfat_web/widgets/image_picker.dart';
 
-class AddDishPage extends StatefulWidget {
+class AddDishPage extends StatelessWidget {
   const AddDishPage();
-
-  @override
-  _AddDishPageState createState() => _AddDishPageState();
-}
-
-class _AddDishPageState extends State<AddDishPage> {
-  @override
-  void dispose() {
-    context.read<AddDishProvider>().setDishId = null;
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {

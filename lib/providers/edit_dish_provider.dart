@@ -1,8 +1,10 @@
+import 'package:html/parser.dart' as html_parser;
+import 'package:html/dom.dart' as dom;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:wasfat_web/firebase/dishes_services.dart';
-import 'package:wasfat_web/helper/constants.dart';
 import 'package:wasfat_web/helper/dish_description_utils.dart';
 import 'package:wasfat_web/models/dish.dart';
 import 'package:wasfat_web/providers/dishes_provider.dart';
@@ -26,75 +28,49 @@ class EditDishProvider extends ChangeNotifier {
     super.dispose();
   }
 
+  List<dom.Element> _descriptionElements = [];
+
   String getSubtitle(String subtitle) {
     this._subtitle.text = subtitle;
     return subtitle;
   }
 
-  Map<DishDishcriptionContents, String> splitIngredientsFromSteps(
-    String value,
-  ) {
-    List<String> values = [];
-    final result = Map<DishDishcriptionContents, String>();
-    if (value.contains(h2 + stepsType1 + h2Close))
-      values = value.split(h2 + stepsType1 + h2Close);
-    else if (value.contains(h2 + stepsType2 + h2Close))
-      values = value.split(h2 + stepsType2 + h2Close);
-    else if (value.contains(h2 + stepsType3 + h2Close))
-      values = value.split(h2 + stepsType3 + h2Close);
-    else if (value.contains(h2 + stepsType4 + h2Close))
-      values = value.split(h2 + stepsType4 + h2Close);
-    else if (value.contains(h2 + stepsType5 + h2Close))
-      values = value.split(h2 + stepsType5 + h2Close);
-    else {
-      result[DishDishcriptionContents.Ingredients] = value;
-      result[DishDishcriptionContents.Steps] = "";
+  void parseDishDescription(String dishDescription, List<String> dishImages) {
+    final hasImages = dishImages.isNotEmpty;
+    final parsedIngredients = filterIngredientsKeywords(dishDescription);
+    final parsedSteps = filterIngredientsKeywords(parsedIngredients);
+    final document = html_parser.parseFragment(parsedSteps);
+    _descriptionElements = document.children;
+    final stepsEndIndex = _descriptionElements.length - 1;
+    final ingredientEndIndex = _descriptionElements
+        .lastIndexWhere((element) => element.localName == 'h2');
+    final ingredientsElements = _descriptionElements.take(ingredientEndIndex);
+    final stepsElements = _descriptionElements.getRange(
+        ingredientEndIndex + 1, stepsEndIndex + 1);
+    final ingredientString = StringBuffer();
+    final stepsString = StringBuffer();
+    ingredientsElements.forEach((element) {
+      final text = element.text;
+      if (text.isNotEmpty) ingredientString.writeln(text);
+    });
+    stepsElements.forEach((element) {
+      final text = element.text;
+      final imageUrl = element.attributes['src'];
+      if (hasImages && imageUrl != null) {
+        final imageIndex = dishImages.indexOf(imageUrl);
+        stepsString.writeln('image$imageIndex');
+      } else if (text.isNotEmpty) stepsString.writeln(text);
+    });
 
-      return result;
-    }
-    result[DishDishcriptionContents.Ingredients] = values.first;
-    result[DishDishcriptionContents.Steps] = values.last;
-    return result;
-  }
-
-  String getIngredients(String dishDescription) {
-    String ingredients = splitIngredientsFromSteps(
-        dishDescription)[DishDishcriptionContents.Ingredients]!;
-    ingredients = ingredients.replaceAll(h2Close, '$h2Close' + '\n');
-    ingredients = ingredients.replaceAll(pClose, '$pClose' + '\n');
-    this._ingredients.text = ingredients;
-    return ingredients;
-  }
-
-  String getSteps(String dishDescription, List<String> images) {
-    String steps = splitIngredientsFromSteps(
-        dishDescription)[DishDishcriptionContents.Steps]!;
-    steps = steps.replaceAll(h2Close, '$h2Close' + '\n');
-    steps = steps.replaceAll(pClose, '$pClose' + '\n');
-    late String result;
-    if (images.isEmpty)
-      result = steps;
-    else
-      result = getStepsWithoutImages(steps, images);
-    this._description.text = result;
-    return result;
-  }
-
-  String getStepsWithoutImages(String steps, List<String> images) {
-    String finalResult = steps;
-    for (final image in images) {
-      final index = images.indexOf(image);
-      finalResult = finalResult.replaceAll(image, 'image$index');
-    }
-    return finalResult;
+    this._ingredients.text = ingredientString.toString();
+    this._description.text = stepsString.toString();
   }
 
   Future<void> editDish(Dish dish) async {
     final subtitle = this._subtitle.text;
-    final ingredients = this._ingredients.text;
-    final description = this._description.text;
-    final steps = stepsModelingAndValidation(description, dish.dishImages);
-    final dishDescription = dishDescriptionFormation(ingredients, steps);
+    final ingredients = ingredientsToHtml(_ingredients.text);
+    final description = stepsToHtml(_description.text, dish.dishImages);
+    final dishDescription = makeDishDescription(ingredients, description);
     final editedDish = dish.copyWith(
       subtitle: subtitle.isNotEmpty ? subtitle : null,
       dishDescription: dishDescription,
