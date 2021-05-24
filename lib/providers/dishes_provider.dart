@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast_web.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wasfat_web/firebase/dishes_services.dart';
 import 'package:wasfat_web/models/dish.dart';
 
@@ -10,7 +11,7 @@ class DishesProvider extends ChangeNotifier {
   final DishesService _dishesService;
   DishesProvider(this._dishesService);
 
-  final _controller = PagingController<int, Dish>(firstPageKey: 1);
+  final _controller = PagingController<int, Dish>(firstPageKey: 10);
   PagingController<int, Dish> get controller => this._controller;
 
   StreamSubscription<List<String>>? _likesSubscription;
@@ -34,18 +35,6 @@ class DishesProvider extends ChangeNotifier {
   set searchDishes(List<Dish> value) {
     this._searchDishes = value;
     notifyListeners();
-  }
-
-  Future<List<Dish>> getDishes({
-    int? pageSize,
-    int? lastAddDish,
-  }) async {
-    final result = await _dishesService.getDishes(
-      pageSize: pageSize,
-      lastAddDish: lastAddDish,
-    );
-    dishes = result.toSet();
-    return dishes.toList();
   }
 
   Future<void> listenDishLikes(String dishId) async {
@@ -73,17 +62,12 @@ class DishesProvider extends ChangeNotifier {
   Future<void> handleDishesPagination() async {
     try {
       this._controller.addPageRequestListener((pageKey) async {
-        late int lastAddDish;
-        if (this._dishes.isNotEmpty)
-          lastAddDish = this._dishes.last.addDate.millisecondsSinceEpoch;
-        else
-          lastAddDish = 0;
-        final result = await getDishes(lastAddDish: lastAddDish);
-        final isLastPage = dishes.length < 10;
+        final result = await _dishesService.getDishes(pageSize: pageKey);
+        final isLastPage = result.length < 10;
         if (isLastPage)
-          this._controller.appendLastPage(result);
+          this._controller.appendLastPage(result.toSet().toList());
         else
-          this._controller.appendPage(result, pageKey++);
+          this._controller.appendPage(result.toSet().toList(), pageKey + 10);
       });
     } catch (error) {
       await FluttertoastWebPlugin().addHtmlToast(msg: '$error');
@@ -93,6 +77,7 @@ class DishesProvider extends ChangeNotifier {
 
   void refresh() {
     _controller.itemList?.clear();
+    this._dishes.clear();
     _controller.nextPageKey = 0;
     _controller.refresh();
   }
@@ -101,6 +86,7 @@ class DishesProvider extends ChangeNotifier {
   void dispose() {
     this._controller.dispose();
     _likesSubscription?.cancel();
+    SharedPreferences.getInstance().then((value) => value.remove('pageKey'));
     super.dispose();
   }
 }

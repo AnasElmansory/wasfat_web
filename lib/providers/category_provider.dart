@@ -37,4 +37,18 @@ class CategoriesProvider extends ChangeNotifier {
     final result = await _categoryService.getCategories();
     categories = result;
   }
+
+  Future<void> updateCategoryPriority(
+    FoodCategory category,
+    int newPriority,
+  ) async {
+    final updatedCategory = await _categoryService.changeCategoryPriority(
+      category,
+      newPriority,
+    );
+    final updatedCategoryIndex =
+        categories.indexWhere((c) => c.id == category.id);
+    categories[updatedCategoryIndex] = updatedCategory;
+    notifyListeners();
+  }
 }

@@ -13,4 +13,13 @@ class CategoryService {
         .toList();
     return categories;
   }
+
+  Future<FoodCategory> changeCategoryPriority(
+    FoodCategory category,
+    int newPriority,
+  ) async {
+    final query = _firestore.collection('food_category').doc(category.id);
+    await query.update({'priority': newPriority});
+    return category.copyWith(priority: newPriority);
+  }
 }

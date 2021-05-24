@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wasfat_web/models/dish.dart';
 import 'package:wasfat_web/providers/auth_provider.dart';
 
@@ -41,16 +42,35 @@ class DishesService {
   }
 
   Future<List<Dish>> getDishes({
-    int? pageSize,
-    int? lastAddDish,
+    required int pageSize,
   }) async {
-    final limit = pageSize ?? 10;
-    final orderQuery = _firestore.collection('dishes').orderBy('addDate');
-    final query = await orderQuery.startAfter([lastAddDish]).limit(limit).get();
-    final dishes =
-        query.docs.map<Dish>((dish) => Dish.fromMap(dish.data())).toList();
+    final orderQuery =
+        _firestore.collection('dishes').orderBy('addDate', descending: true);
+    final query = await orderQuery.limit(pageSize).get();
+    final docsList = query.docs;
+    final dishes = docsList.map<Dish>((dish) {
+      return Dish.fromMap(dish.data());
+    }).toList();
     return dishes;
   }
+
+  // Future<List<Dish>> getPaginatedDishes({
+  //   int? pageSize,
+  // }) async {
+  //   print('this');
+  //   final shared = await SharedPreferences.getInstance();
+  //   final pageKey = shared.getInt('pageKey') ?? 0;
+  //   final limit = pageSize ?? 10;
+  //   final orderQuery =
+  //       _firestore.collection('dishes').orderBy('addDate', descending: true);
+  //   final query = await orderQuery.startAfter([pageKey]).limit(limit).get();
+  //   final docsList = query.docs;
+  //   await shared.setInt('pageKey', docsList.last.data()['addDate']);
+  //   final dishes = docsList.map<Dish>((dish) {
+  //     return Dish.fromMap(dish.data());
+  //   }).toList();
+  //   return dishes;
+  // }
 
   Future<List<Dish>> searchDish(String query) async {
     final searchQuery = await _firestore

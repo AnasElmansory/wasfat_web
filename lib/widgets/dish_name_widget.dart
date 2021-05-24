@@ -6,18 +6,14 @@ class DishName extends StatelessWidget {
   const DishName();
   @override
   Widget build(BuildContext context) {
-    // final size = context.mediaQuerySize;
     final addDishProvider = context.watch<AddDishProvider>();
     return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        // height: size.height * 0.2,
-        // width: size.width * 0.5,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: TextField(
             controller: addDishProvider.dishNameController,
             maxLength: 50,
-            // maxLines: 1,
             decoration: const InputDecoration(
               border: const OutlineInputBorder(
                 borderSide: const BorderSide(

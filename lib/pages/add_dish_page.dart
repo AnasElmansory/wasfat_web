@@ -42,7 +42,7 @@ class AddDishPage extends StatelessWidget {
                   ),
                   const Expanded(
                     flex: 1,
-                    child: const DishDescription(forEdit: false),
+                    child: const DishSubtitle(forEdit: false),
                   ),
                 ],
               ),
@@ -52,11 +52,11 @@ class AddDishPage extends StatelessWidget {
                 children: [
                   const Expanded(
                     flex: 1,
-                    child: const DishSubtitle(forEdit: false),
+                    child: const DishIngredients(forEdit: false),
                   ),
                   const Expanded(
                     flex: 1,
-                    child: const DishIngredients(forEdit: false),
+                    child: const DishDescription(forEdit: false),
                   ),
                 ],
               ),

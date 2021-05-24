@@ -23,10 +23,12 @@ class _DishesSearchBarState extends State<DishesSearchBar> {
     final dishProvider = context.watch<DishesProvider>();
     return FloatingSearchBar(
       controller: _controller,
-      onSubmitted: (query) async {
-        final result = await dishProvider.searchDish(query);
-        print(result.length);
+      onFocusChanged: (focused) {
+        if (!focused) {
+          dishProvider.searchDishes = const [];
+        }
       },
+      onSubmitted: (query) async => await dishProvider.searchDish(query),
       builder: (context, transition) {
         return Container(
           color: Colors.black.withAlpha(20),

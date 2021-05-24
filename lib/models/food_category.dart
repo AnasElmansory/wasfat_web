@@ -8,14 +8,14 @@ class FoodCategory {
   final String id;
   final String name;
   final String imageUrl;
-  final String? banner;
+  final int priority;
   final List<Dish>? dishes;
 
   const FoodCategory({
     required this.id,
     required this.name,
     required this.imageUrl,
-    this.banner,
+    required this.priority,
     this.dishes,
   });
 
@@ -23,14 +23,14 @@ class FoodCategory {
     String? id,
     String? name,
     String? imageUrl,
-    String? banner,
+    int? priority,
     List<Dish>? dishes,
   }) {
     return FoodCategory(
       id: id ?? this.id,
       name: name ?? this.name,
       imageUrl: imageUrl ?? this.imageUrl,
-      banner: banner ?? this.banner,
+      priority: priority ?? this.priority,
       dishes: dishes ?? this.dishes,
     );
   }
@@ -40,7 +40,7 @@ class FoodCategory {
       'id': id,
       'name': name,
       'imageUrl': imageUrl,
-      'banner': banner,
+      'priority': priority,
       'dishes': dishes?.map((x) => x.toMap()).toList(),
     };
   }
@@ -53,7 +53,7 @@ class FoodCategory {
       id: map['id'],
       name: map['name'],
       imageUrl: map['imageUrl'],
-      banner: map['banner'],
+      priority: map['priority'],
       dishes: dishes,
     );
   }
@@ -65,7 +65,7 @@ class FoodCategory {
 
   @override
   String toString() {
-    return 'FoodCategory(id: $id, name: $name, imageUrl: $imageUrl, banner: $banner, dishes: $dishes)';
+    return 'FoodCategory(id: $id, name: $name, imageUrl: $imageUrl, priority: $priority, dishes: $dishes)';
   }
 
   @override
@@ -76,7 +76,7 @@ class FoodCategory {
         other.id == id &&
         other.name == name &&
         other.imageUrl == imageUrl &&
-        other.banner == banner &&
+        other.priority == priority &&
         listEquals(other.dishes, dishes);
   }
 
@@ -85,7 +85,7 @@ class FoodCategory {
     return id.hashCode ^
         name.hashCode ^
         imageUrl.hashCode ^
-        banner.hashCode ^
+        priority.hashCode ^
         dishes.hashCode;
   }
 }
